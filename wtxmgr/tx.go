@@ -109,8 +109,9 @@ func NewTxRecordFromMsgTx(msgTx *wire.MsgTx, received time.Time) (*TxRecord, err
 		MsgTx:        *msgTx,
 		Received:     received,
 		SerializedTx: buf.Bytes(),
+		Hash:         msgTx.TxSha(),
 	}
-	copy(rec.Hash[:], wire.DoubleSha256(rec.SerializedTx))
+
 	return rec, nil
 }
 
