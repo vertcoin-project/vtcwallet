@@ -299,6 +299,7 @@ func (w *Wallet) SetChainSynced(synced bool) {
 // rescan request.
 func (w *Wallet) activeData() ([]btcutil.Address, []wtxmgr.Credit, error) {
 	var addrs []btcutil.Address
+	// TODO(roasbeef): lookahead?
 	err := w.Manager.ForEachActiveAddress(func(addr btcutil.Address) error {
 		addrs = append(addrs, addr)
 		return nil
@@ -335,6 +336,7 @@ func (w *Wallet) syncWithChain() error {
 
 	// Request notifications for transactions sending to all wallet
 	// addresses.
+	// TODO(roasbeef): need to check 3 versions of each key?
 	addrs, unspent, err := w.activeData()
 	if err != nil {
 		return err
@@ -720,7 +722,8 @@ func (w *Wallet) CurrentAddress(account uint32) (btcutil.Address, error) {
 	if err != nil {
 		// If no address exists yet, create the first external address
 		if waddrmgr.IsError(err, waddrmgr.ErrAddressNotFound) {
-			return w.NewAddress(account)
+			// TODO(roasbeef): what to default to ?
+			return w.NewAddress(account, waddrmgr.WitnessPubKey)
 		}
 		return nil, err
 	}
@@ -731,7 +734,7 @@ func (w *Wallet) CurrentAddress(account uint32) (btcutil.Address, error) {
 		return nil, err
 	}
 	if used {
-		return w.NewAddress(account)
+		return w.NewAddress(account, waddrmgr.WitnessPubKey)
 	}
 
 	return addr.Address(), nil
@@ -1401,6 +1404,8 @@ func (w *Wallet) ListUnspent(minconf, maxconf int32,
 			spendable = true
 		case txscript.PubKeyTy:
 			spendable = true
+		case txscript.WitnessPubKeyHashTy:
+			spendable = true
 		case txscript.ScriptHashTy:
 			spendable = true
 		case txscript.MultiSigTy:
@@ -1698,9 +1703,11 @@ func (w *Wallet) SortedActivePaymentAddresses() ([]string, error) {
 }
 
 // NewAddress returns the next external chained address for a wallet.
-func (w *Wallet) NewAddress(account uint32) (btcutil.Address, error) {
+func (w *Wallet) NewAddress(account uint32,
+	addrType waddrmgr.AddressType) (btcutil.Address, error) {
+
 	// Get next address from wallet.
-	addrs, err := w.Manager.NextExternalAddresses(account, 1)
+	addrs, err := w.Manager.NextExternalAddresses(account, 1, addrType)
 	if err != nil {
 		return nil, err
 	}
@@ -1732,9 +1739,11 @@ func (w *Wallet) NewAddress(account uint32) (btcutil.Address, error) {
 }
 
 // NewChangeAddress returns a new change address for a wallet.
-func (w *Wallet) NewChangeAddress(account uint32) (btcutil.Address, error) {
+func (w *Wallet) NewChangeAddress(account uint32,
+	addrType waddrmgr.AddressType) (btcutil.Address, error) {
+
 	// Get next chained change address from wallet for account.
-	addrs, err := w.Manager.NextInternalAddresses(account, 1)
+	addrs, err := w.Manager.NextInternalAddresses(account, 1, addrType)
 	if err != nil {
 		return nil, err
 	}
@@ -2008,6 +2017,8 @@ func (w *Wallet) SignTransaction(tx *wire.MsgTx, hashType txscript.SigHashType,
 		// so we always verify the output.
 		if (hashType&txscript.SigHashSingle) !=
 			txscript.SigHashSingle || i < len(tx.TxOut) {
+
+			// TODO(roasbeef): make aware of witness, and nested p2sh
 
 			script, err := txscript.SignTxOutput(w.ChainParams(),
 				tx, i, prevOutScript, hashType, getKey,
