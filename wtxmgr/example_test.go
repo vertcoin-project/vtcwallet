@@ -7,8 +7,8 @@ package wtxmgr_test
 import (
 	"fmt"
 
-	"github.com/btcsuite/btcd/wire"
-	"github.com/btcsuite/btcwallet/wtxmgr"
+	"github.com/roasbeef/btcd/wire"
+	"github.com/roasbeef/btcwallet/wtxmgr"
 )
 
 var (

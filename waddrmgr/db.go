@@ -10,10 +10,10 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/btcsuite/btcd/chaincfg"
-	"github.com/btcsuite/btcd/wire"
-	"github.com/btcsuite/btcutil/hdkeychain"
-	"github.com/btcsuite/btcwallet/walletdb"
+	"github.com/roasbeef/btcd/chaincfg"
+	"github.com/roasbeef/btcd/wire"
+	"github.com/roasbeef/btcutil/hdkeychain"
+	"github.com/roasbeef/btcwallet/walletdb"
 	"github.com/btcsuite/fastsha256"
 )
 
