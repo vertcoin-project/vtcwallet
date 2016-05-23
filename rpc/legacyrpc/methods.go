@@ -725,7 +725,7 @@ func GetNewAddress(icmd interface{}, w *wallet.Wallet) (interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
-	addr, err := w.NewAddress(account)
+	addr, err := w.NewAddress(account, waddrmgr.PubKeyHash)
 	if err != nil {
 		return nil, err
 	}
@@ -750,7 +750,7 @@ func GetRawChangeAddress(icmd interface{}, w *wallet.Wallet) (interface{}, error
 	if err != nil {
 		return nil, err
 	}
-	addr, err := w.NewChangeAddress(account)
+	addr, err := w.NewChangeAddress(account, waddrmgr.PubKeyHash)
 	if err != nil {
 		return nil, err
 	}
