@@ -1249,7 +1249,7 @@ func ListSinceBlock(icmd interface{}, w *wallet.Wallet, chainClient *chain.RPCCl
 		if err != nil {
 			return nil, DeserializationError{err}
 		}
-		block, err := chainClient.GetBlockVerbose(hash, false)
+		block, err := chainClient.GetBlockVerboseTx(hash)
 		if err != nil {
 			return nil, err
 		}
