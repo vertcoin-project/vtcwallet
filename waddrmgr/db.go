@@ -1,4 +1,4 @@
-// Copyright (c) 2014 The btcsuite developers
+// Copyright (c) 2014-2016 The btcsuite developers
 // Use of this source code is governed by an ISC
 // license that can be found in the LICENSE file.
 
@@ -10,11 +10,11 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/btcsuite/fastsha256"
 	"github.com/roasbeef/btcd/chaincfg"
-	"github.com/roasbeef/btcd/wire"
+	"github.com/roasbeef/btcd/chaincfg/chainhash"
 	"github.com/roasbeef/btcutil/hdkeychain"
 	"github.com/roasbeef/btcwallet/walletdb"
-	"github.com/btcsuite/fastsha256"
 )
 
 const (
@@ -1453,7 +1453,7 @@ func putStartBlock(tx walletdb.Tx, bs *BlockStamp) error {
 
 // fetchRecentBlocks returns the height of the most recent block height and
 // hashes of the most recent blocks.
-func fetchRecentBlocks(tx walletdb.Tx) (int32, []wire.ShaHash, error) {
+func fetchRecentBlocks(tx walletdb.Tx) (int32, []chainhash.Hash, error) {
 	bucket := tx.RootBucket().Bucket(syncBucketName)
 
 	// The serialized recent blocks format is:
@@ -1472,7 +1472,7 @@ func fetchRecentBlocks(tx walletdb.Tx) (int32, []wire.ShaHash, error) {
 
 	recentHeight := int32(binary.LittleEndian.Uint32(buf[0:4]))
 	numHashes := binary.LittleEndian.Uint32(buf[4:8])
-	recentHashes := make([]wire.ShaHash, numHashes)
+	recentHashes := make([]chainhash.Hash, numHashes)
 	offset := 8
 	for i := uint32(0); i < numHashes; i++ {
 		copy(recentHashes[i][:], buf[offset:offset+32])
@@ -1483,7 +1483,7 @@ func fetchRecentBlocks(tx walletdb.Tx) (int32, []wire.ShaHash, error) {
 }
 
 // putRecentBlocks stores the provided start block stamp to the database.
-func putRecentBlocks(tx walletdb.Tx, recentHeight int32, recentHashes []wire.ShaHash) error {
+func putRecentBlocks(tx walletdb.Tx, recentHeight int32, recentHashes []chainhash.Hash) error {
 	bucket := tx.RootBucket().Bucket(syncBucketName)
 
 	// The serialized recent blocks format is:

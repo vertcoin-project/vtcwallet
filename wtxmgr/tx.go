@@ -1,4 +1,4 @@
-// Copyright (c) 2013-2015 The btcsuite developers
+// Copyright (c) 2013-2016 The btcsuite developers
 // Use of this source code is governed by an ISC
 // license that can be found in the LICENSE file.
 
@@ -9,6 +9,8 @@ import (
 	"time"
 
 	"github.com/roasbeef/btcd/blockchain"
+	"github.com/roasbeef/btcd/chaincfg"
+	"github.com/roasbeef/btcd/chaincfg/chainhash"
 	"github.com/roasbeef/btcd/wire"
 	"github.com/roasbeef/btcutil"
 	"github.com/roasbeef/btcwallet/walletdb"
@@ -17,7 +19,7 @@ import (
 // Block contains the minimum amount of data to uniquely identify any block on
 // either the best or side chain.
 type Block struct {
-	Hash   wire.ShaHash
+	Hash   chainhash.Hash
 	Height int32
 }
 
@@ -34,7 +36,7 @@ type BlockMeta struct {
 type blockRecord struct {
 	Block
 	Time         time.Time
-	transactions []wire.ShaHash
+	transactions []chainhash.Hash
 }
 
 // incidence records the block hash and blockchain height of a mined transaction.
@@ -42,7 +44,7 @@ type blockRecord struct {
 // transaction (duplicate transaction hashes are allowed), the incidence is used
 // instead.
 type incidence struct {
-	txHash wire.ShaHash
+	txHash chainhash.Hash
 	block  Block
 }
 
@@ -56,7 +58,7 @@ type indexedIncidence struct {
 // debit records the debits a transaction record makes from previous wallet
 // transaction credits.
 type debit struct {
-	txHash wire.ShaHash
+	txHash chainhash.Hash
 	index  uint32
 	amount btcutil.Amount
 	spends indexedIncidence
@@ -74,7 +76,7 @@ type credit struct {
 // TxRecord represents a transaction managed by the Store.
 type TxRecord struct {
 	MsgTx        wire.MsgTx
-	Hash         wire.ShaHash
+	Hash         chainhash.Hash
 	Received     time.Time
 	SerializedTx []byte // Optional: may be nil
 }
@@ -92,7 +94,7 @@ func NewTxRecord(serializedTx []byte, received time.Time) (*TxRecord, error) {
 		str := "failed to deserialize transaction"
 		return nil, storeError(ErrInput, str, err)
 	}
-	copy(rec.Hash[:], wire.DoubleSha256(serializedTx))
+	copy(rec.Hash[:], chainhash.DoubleHashB(serializedTx))
 	return rec, nil
 }
 
@@ -109,7 +111,7 @@ func NewTxRecordFromMsgTx(msgTx *wire.MsgTx, received time.Time) (*TxRecord, err
 		MsgTx:        *msgTx,
 		Received:     received,
 		SerializedTx: buf.Bytes(),
-		Hash:         msgTx.TxSha(),
+		Hash:         msgTx.TxHash(),
 	}
 
 	return rec, nil
@@ -130,23 +132,24 @@ type Credit struct {
 // Store implements a transaction store for storing and managing wallet
 // transactions.
 type Store struct {
-	namespace walletdb.Namespace
+	namespace   walletdb.Namespace
+	chainParams *chaincfg.Params
 
 	// Event callbacks.  These execute in the same goroutine as the wtxmgr
 	// caller.
-	NotifyUnspent func(hash *wire.ShaHash, index uint32)
+	NotifyUnspent func(hash *chainhash.Hash, index uint32)
 }
 
 // Open opens the wallet transaction store from a walletdb namespace.  If the
 // store does not exist, ErrNoExist is returned.  Existing stores will be
 // upgraded to new database formats as necessary.
-func Open(namespace walletdb.Namespace) (*Store, error) {
+func Open(namespace walletdb.Namespace, chainParams *chaincfg.Params) (*Store, error) {
 	// Open the store, upgrading to the latest version as needed.
 	err := openStore(namespace)
 	if err != nil {
 		return nil, err
 	}
-	return &Store{namespace, nil}, nil // TODO: set callbacks
+	return &Store{namespace, chainParams, nil}, nil // TODO: set callbacks
 }
 
 // Create creates a new persistent transaction store in the walletdb namespace.
@@ -856,9 +859,10 @@ func (s *Store) balance(ns walletdb.Bucket, minConf int32, syncHeight int32) (bt
 
 	// Decrement the balance for any unspent credit with less than
 	// minConf confirmations and any (unspent) immature coinbase credit.
+	coinbaseMaturity := int32(s.chainParams.CoinbaseMaturity)
 	stopConf := minConf
-	if blockchain.CoinbaseMaturity > stopConf {
-		stopConf = blockchain.CoinbaseMaturity
+	if coinbaseMaturity > stopConf {
+		stopConf = coinbaseMaturity
 	}
 	lastHeight := syncHeight - stopConf
 	blockIt := makeReverseBlockIterator(ns)
@@ -898,7 +902,7 @@ func (s *Store) balance(ns walletdb.Bucket, minConf int32, syncHeight int32) (bt
 				}
 				confs := syncHeight - block.Height + 1
 				if confs < minConf || (blockchain.IsCoinBaseTx(&rec.MsgTx) &&
-					confs < blockchain.CoinbaseMaturity) {
+					confs < coinbaseMaturity) {
 					bal -= amt
 				}
 			}

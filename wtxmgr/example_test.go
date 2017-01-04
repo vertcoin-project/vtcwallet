@@ -7,6 +7,8 @@ package wtxmgr_test
 import (
 	"fmt"
 
+	"github.com/roasbeef/btcd/chaincfg"
+	"github.com/roasbeef/btcd/chaincfg/chainhash"
 	"github.com/roasbeef/btcd/wire"
 	"github.com/roasbeef/btcwallet/wtxmgr"
 )
@@ -22,7 +24,7 @@ var (
 )
 
 func init() {
-	tx := spendOutput(&wire.ShaHash{}, 0, 10e8)
+	tx := spendOutput(&chainhash.Hash{}, 0, 10e8)
 	rec, err := wtxmgr.NewTxRecordFromMsgTx(tx, timeNow())
 	if err != nil {
 		panic(err)
@@ -160,7 +162,7 @@ func Example_basicUsage() {
 		fmt.Println(err)
 		return
 	}
-	s, err := wtxmgr.Open(ns)
+	s, err := wtxmgr.Open(ns, &chaincfg.TestNet3Params)
 	if err != nil {
 		fmt.Println(err)
 		return

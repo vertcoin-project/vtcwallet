@@ -25,7 +25,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 
-	"github.com/roasbeef/btcd/blockchain"
+	"github.com/roasbeef/btcd/chaincfg/chainhash"
 	"github.com/roasbeef/btcd/txscript"
 	"github.com/roasbeef/btcd/wire"
 	"github.com/roasbeef/btcrpcclient"
@@ -340,8 +340,9 @@ func (s *walletServer) FundTransaction(ctx context.Context, req *pb.FundTransact
 		if !confirmed(req.RequiredConfirmations, output.Height, syncBlock.Height) {
 			continue
 		}
+		target := int32(s.wallet.ChainParams().CoinbaseMaturity)
 		if !req.IncludeImmatureCoinbases && output.FromCoinBase &&
-			!confirmed(blockchain.CoinbaseMaturity, output.Height, syncBlock.Height) {
+			!confirmed(target, output.Height, syncBlock.Height) {
 			continue
 		}
 
@@ -417,7 +418,7 @@ func (s *walletServer) GetTransactions(ctx context.Context, req *pb.GetTransacti
 		return nil, errors.New(
 			"starting block hash and height may not be specified simultaneously")
 	} else if req.StartingBlockHash != nil {
-		startBlockHash, err := wire.NewShaHash(req.StartingBlockHash)
+		startBlockHash, err := chainhash.NewHash(req.StartingBlockHash)
 		if err != nil {
 			return nil, grpc.Errorf(codes.InvalidArgument, "%s", err.Error())
 		}
@@ -430,7 +431,7 @@ func (s *walletServer) GetTransactions(ctx context.Context, req *pb.GetTransacti
 		return nil, grpc.Errorf(codes.InvalidArgument,
 			"ending block hash and height may not be specified simultaneously")
 	} else if req.EndingBlockHash != nil {
-		endBlockHash, err := wire.NewShaHash(req.EndingBlockHash)
+		endBlockHash, err := chainhash.NewHash(req.EndingBlockHash)
 		if err != nil {
 			return nil, grpc.Errorf(codes.InvalidArgument, "%s", err.Error())
 		}
@@ -607,7 +608,7 @@ func marshalBlocks(v []wallet.Block) []*pb.BlockDetails {
 	return blocks
 }
 
-func marshalHashes(v []*wire.ShaHash) [][]byte {
+func marshalHashes(v []*chainhash.Hash) [][]byte {
 	hashes := make([][]byte, len(v))
 	for i, hash := range v {
 		hashes[i] = hash[:]
