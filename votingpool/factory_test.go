@@ -27,8 +27,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Roasbeef/btcd/chaincfg/chainhash"
 	"github.com/roasbeef/btcd/chaincfg"
+	"github.com/roasbeef/btcd/chaincfg/chainhash"
 	"github.com/roasbeef/btcd/txscript"
 	"github.com/roasbeef/btcd/wire"
 	"github.com/roasbeef/btcutil"

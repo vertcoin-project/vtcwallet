@@ -12,9 +12,9 @@ import (
 
 	"golang.org/x/crypto/ssh/terminal"
 
-	"github.com/Roasbeef/btcd/chaincfg/chainhash"
 	"github.com/jessevdk/go-flags"
 	"github.com/roasbeef/btcd/btcjson"
+	"github.com/roasbeef/btcd/chaincfg/chainhash"
 	"github.com/roasbeef/btcd/txscript"
 	"github.com/roasbeef/btcd/wire"
 	"github.com/roasbeef/btcrpcclient"
