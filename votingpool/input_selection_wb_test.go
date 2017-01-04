@@ -10,16 +10,10 @@ import (
 	"sort"
 	"testing"
 
-<<<<<<< HEAD
-	"github.com/roasbeef/btcd/wire"
-	"github.com/roasbeef/btcutil"
-	"github.com/roasbeef/btcwallet/wtxmgr"
-=======
+	"github.com/btcsuite/btcwallet/wtxmgr"
 	"github.com/roasbeef/btcd/chaincfg/chainhash"
 	"github.com/roasbeef/btcd/wire"
 	"github.com/roasbeef/btcutil"
-	"github.com/btcsuite/btcwallet/wtxmgr"
->>>>>>> upstream/master
 )
 
 var (
