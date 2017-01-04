@@ -10,17 +10,10 @@ import (
 	"os"
 	"path/filepath"
 
-<<<<<<< HEAD
+	"github.com/jessevdk/go-flags"
 	"github.com/roasbeef/btcutil"
 	"github.com/roasbeef/btcwallet/walletdb"
 	_ "github.com/roasbeef/btcwallet/walletdb/bdb"
-	"github.com/btcsuite/go-flags"
-=======
-	"github.com/roasbeef/btcutil"
-	"github.com/btcsuite/btcwallet/walletdb"
-	_ "github.com/btcsuite/btcwallet/walletdb/bdb"
-	"github.com/jessevdk/go-flags"
->>>>>>> upstream/master
 )
 
 const defaultNet = "mainnet"

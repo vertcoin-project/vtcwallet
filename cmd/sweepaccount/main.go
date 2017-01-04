@@ -10,7 +10,10 @@ import (
 	"os"
 	"path/filepath"
 
-<<<<<<< HEAD
+	"golang.org/x/crypto/ssh/terminal"
+
+	"github.com/Roasbeef/btcd/chaincfg/chainhash"
+	"github.com/jessevdk/go-flags"
 	"github.com/roasbeef/btcd/btcjson"
 	"github.com/roasbeef/btcd/txscript"
 	"github.com/roasbeef/btcd/wire"
@@ -20,21 +23,6 @@ import (
 	"github.com/roasbeef/btcwallet/netparams"
 	"github.com/roasbeef/btcwallet/wallet/txauthor"
 	"github.com/roasbeef/btcwallet/wallet/txrules"
-	"github.com/btcsuite/go-flags"
-=======
-	"github.com/roasbeef/btcd/btcjson"
-	"github.com/roasbeef/btcd/chaincfg/chainhash"
-	"github.com/roasbeef/btcd/txscript"
-	"github.com/roasbeef/btcd/wire"
-	"github.com/btcsuite/btcrpcclient"
-	"github.com/roasbeef/btcutil"
-	"github.com/btcsuite/btcwallet/internal/cfgutil"
-	"github.com/btcsuite/btcwallet/netparams"
-	"github.com/btcsuite/btcwallet/wallet/txauthor"
-	"github.com/btcsuite/btcwallet/wallet/txrules"
->>>>>>> upstream/master
-	"github.com/btcsuite/golangcrypto/ssh/terminal"
-	"github.com/jessevdk/go-flags"
 )
 
 var (
