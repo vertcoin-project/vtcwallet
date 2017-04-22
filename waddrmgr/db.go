@@ -1064,7 +1064,7 @@ func putAddress(ns walletdb.ReadWriteBucket, addressID []byte, row *dbAddressRow
 
 // putChainedAddress stores the provided chained address information to the
 // database.
-func putChainedAddress(ns walletdb.ReadWriteBucket, tx walletdb.Tx, addressID []byte, account uint32,
+func putChainedAddress(ns walletdb.ReadWriteBucket, addressID []byte, account uint32,
 	status syncStatus, branch, index uint32, addrType addressType) error {
 
 	addrRow := dbAddressRow{

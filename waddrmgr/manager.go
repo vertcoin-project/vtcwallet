@@ -1359,8 +1359,7 @@ func (m *Manager) Unlock(ns walletdb.ReadBucket, passphrase []byte) error {
 	// Derive any private keys that are pending due to them being created
 	// while the address manager was locked.
 	for _, info := range m.deriveOnUnlock {
-		// TODO(roasbeef): addr type here?
-		addressKey, err := m.deriveKeyFromPath(ns, info.managedAddr.account,
+		addressKey, err := m.deriveKeyFromPath(ns, info.managedAddr.Account(),
 			info.branch, info.index, true)
 		if err != nil {
 			m.lock()
@@ -1535,7 +1534,7 @@ func (m *Manager) nextAddresses(ns walletdb.ReadWriteBucket, account uint32, num
 
 		switch a := ma.(type) {
 		case *managedAddress:
-			err := putChainedAddress(tx, addressID, account, ssFull,
+			err := putChainedAddress(ns, addressID, account, ssFull,
 				info.branch, info.index, addrType)
 			if err != nil {
 				return nil, maybeConvertDbError(err)
@@ -1545,10 +1544,10 @@ func (m *Manager) nextAddresses(ns walletdb.ReadWriteBucket, account uint32, num
 			if err != nil {
 				str := fmt.Sprintf("failed to encrypt script hash %x",
 					a.AddrHash())
-				return managerError(ErrCrypto, str, err)
+				return nil, managerError(ErrCrypto, str, err)
 			}
 
-			err = putScriptAddress(tx, a.AddrHash(), ImportedAddrAccount,
+			err = putScriptAddress(ns, a.AddrHash(), ImportedAddrAccount,
 				ssNone, encryptedHash, a.scriptEncrypted)
 			if err != nil {
 				return nil, maybeConvertDbError(err)
