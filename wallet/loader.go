@@ -10,7 +10,7 @@ import (
 	"path/filepath"
 	"sync"
 
-	"github.com/roasbeef/btcd/chaincfg"
+	"github.com/vertcoin/vtcd/chaincfg"
 	"github.com/roasbeef/btcwallet/internal/prompt"
 	"github.com/roasbeef/btcwallet/waddrmgr"
 	"github.com/roasbeef/btcwallet/walletdb"

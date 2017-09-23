@@ -8,9 +8,9 @@ import (
 	"fmt"
 
 	"github.com/Roasbeef/btcwallet/walletdb"
-	"github.com/roasbeef/btcd/chaincfg"
-	"github.com/roasbeef/btcd/chaincfg/chainhash"
-	"github.com/roasbeef/btcd/wire"
+	"github.com/vertcoin/vtcd/chaincfg"
+	"github.com/vertcoin/vtcd/chaincfg/chainhash"
+	"github.com/vertcoin/vtcd/wire"
 	"github.com/roasbeef/btcwallet/wtxmgr"
 )
 

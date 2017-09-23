@@ -9,11 +9,11 @@ import (
 	"sync"
 	"time"
 
-	"github.com/roasbeef/btcd/btcjson"
-	"github.com/roasbeef/btcd/chaincfg"
-	"github.com/roasbeef/btcd/chaincfg/chainhash"
+	"github.com/vertcoin/vtcd/btcjson"
+	"github.com/vertcoin/vtcd/chaincfg"
+	"github.com/vertcoin/vtcd/chaincfg/chainhash"
 	"github.com/roasbeef/btcrpcclient"
-	"github.com/roasbeef/btcutil"
+	"github.com/vertcoin/vtcutil"
 	"github.com/roasbeef/btcwallet/waddrmgr"
 	"github.com/roasbeef/btcwallet/wtxmgr"
 )
@@ -253,7 +253,7 @@ func (c *RPCClient) onBlockDisconnected(hash *chainhash.Hash, height int32, time
 	}
 }
 
-func (c *RPCClient) onRecvTx(tx *btcutil.Tx, block *btcjson.BlockDetails) {
+func (c *RPCClient) onRecvTx(tx *vtcutil.Tx, block *btcjson.BlockDetails) {
 	blk, err := parseBlock(block)
 	if err != nil {
 		// Log and drop improper notification.
@@ -273,7 +273,7 @@ func (c *RPCClient) onRecvTx(tx *btcutil.Tx, block *btcjson.BlockDetails) {
 	}
 }
 
-func (c *RPCClient) onRedeemingTx(tx *btcutil.Tx, block *btcjson.BlockDetails) {
+func (c *RPCClient) onRedeemingTx(tx *vtcutil.Tx, block *btcjson.BlockDetails) {
 	// Handled exactly like recvtx notifications.
 	c.onRecvTx(tx, block)
 }
@@ -373,7 +373,7 @@ out:
 			// TODO: A minute timeout is used to prevent the handler loop from
 			// blocking here forever, but this is much larger than it needs to
 			// be due to dcrd processing websocket requests synchronously (see
-			// https://github.com/btcsuite/btcd/issues/504).  Decrease this to
+			// https://github.com/btcsuite/vtcd/issues/504).  Decrease this to
 			// something saner like 3s when the above issue is fixed.
 			type sessionResult struct {
 				err error

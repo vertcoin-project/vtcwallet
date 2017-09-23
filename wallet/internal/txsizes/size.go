@@ -5,7 +5,7 @@
 package txsizes
 
 import (
-	"github.com/roasbeef/btcd/wire"
+	"github.com/vertcoin/vtcd/wire"
 
 	h "github.com/roasbeef/btcwallet/internal/helpers"
 )

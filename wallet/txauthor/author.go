@@ -8,10 +8,10 @@ package txauthor
 import (
 	"errors"
 
-	"github.com/roasbeef/btcd/chaincfg"
-	"github.com/roasbeef/btcd/txscript"
-	"github.com/roasbeef/btcd/wire"
-	"github.com/roasbeef/btcutil"
+	"github.com/vertcoin/vtcd/chaincfg"
+	"github.com/vertcoin/vtcd/txscript"
+	"github.com/vertcoin/vtcd/wire"
+	"github.com/vertcoin/vtcutil"
 	"github.com/roasbeef/btcwallet/wallet/txrules"
 
 	h "github.com/roasbeef/btcwallet/internal/helpers"
@@ -23,8 +23,8 @@ import (
 // can not be satisified, this can be signaled by returning a total amount less
 // than the target or by returning a more detailed error implementing
 // InputSourceError.
-type InputSource func(target btcutil.Amount) (total btcutil.Amount, inputs []*wire.TxIn,
-	inputValues []btcutil.Amount, scripts [][]byte, err error)
+type InputSource func(target vtcutil.Amount) (total vtcutil.Amount, inputs []*wire.TxIn,
+	inputValues []vtcutil.Amount, scripts [][]byte, err error)
 
 // InputSourceError describes the failure to provide enough input value from
 // unspent transaction outputs to meet a target amount.  A typed error is used
@@ -49,8 +49,8 @@ func (insufficientFundsError) Error() string {
 type AuthoredTx struct {
 	Tx              *wire.MsgTx
 	PrevScripts     [][]byte
-	PrevInputValues []btcutil.Amount
-	TotalInput      btcutil.Amount
+	PrevInputValues []vtcutil.Amount
+	TotalInput      vtcutil.Amount
 	ChangeIndex     int // negative if no change
 }
 
@@ -78,7 +78,7 @@ type ChangeSource func() ([]byte, error)
 //
 // BUGS: Fee estimation may be off when redeeming non-compressed P2PKH outputs.
 // TODO(roasbeef): fix fee estimation for witness outputs
-func NewUnsignedTransaction(outputs []*wire.TxOut, relayFeePerKb btcutil.Amount,
+func NewUnsignedTransaction(outputs []*wire.TxOut, relayFeePerKb vtcutil.Amount,
 	fetchInputs InputSource, fetchChange ChangeSource) (*AuthoredTx, error) {
 
 	targetAmount := h.SumOutputValues(outputs)
@@ -173,7 +173,7 @@ type SecretsSource interface {
 // are passed in prevPkScripts and the slice length must match the number of
 // inputs.  Private keys and redeem scripts are looked up using a SecretsSource
 // based on the previous output script.
-func AddAllInputScripts(tx *wire.MsgTx, prevPkScripts [][]byte, inputValues []btcutil.Amount,
+func AddAllInputScripts(tx *wire.MsgTx, prevPkScripts [][]byte, inputValues []vtcutil.Amount,
 	secrets SecretsSource) error {
 
 	inputs := tx.TxIn
@@ -247,11 +247,11 @@ func spendWitnessKeyHash(txIn *wire.TxIn, pkScript []byte,
 	// the compression type of the generated key.
 	var pubKeyHash []byte
 	if compressed {
-		pubKeyHash = btcutil.Hash160(pubKey.SerializeCompressed())
+		pubKeyHash = vtcutil.Hash160(pubKey.SerializeCompressed())
 	} else {
-		pubKeyHash = btcutil.Hash160(pubKey.SerializeUncompressed())
+		pubKeyHash = vtcutil.Hash160(pubKey.SerializeUncompressed())
 	}
-	p2wkhAddr, err := btcutil.NewAddressWitnessPubKeyHash(pubKeyHash, chainParams)
+	p2wkhAddr, err := vtcutil.NewAddressWitnessPubKeyHash(pubKeyHash, chainParams)
 	if err != nil {
 		return err
 	}
@@ -299,16 +299,16 @@ func spendNestedWitnessPubKeyHash(txIn *wire.TxIn, pkScript []byte,
 
 	var pubKeyHash []byte
 	if compressed {
-		pubKeyHash = btcutil.Hash160(pubKey.SerializeCompressed())
+		pubKeyHash = vtcutil.Hash160(pubKey.SerializeCompressed())
 	} else {
-		pubKeyHash = btcutil.Hash160(pubKey.SerializeUncompressed())
+		pubKeyHash = vtcutil.Hash160(pubKey.SerializeUncompressed())
 	}
 
 	// Next, we'll generate a valid sigScript that'll allow us to spend
 	// the p2sh output. The sigScript will contain only a single push of
 	// the p2wkh witness program corresponding to the matching public key
 	// of this address.
-	p2wkhAddr, err := btcutil.NewAddressWitnessPubKeyHash(pubKeyHash, chainParams)
+	p2wkhAddr, err := vtcutil.NewAddressWitnessPubKeyHash(pubKeyHash, chainParams)
 	if err != nil {
 		return err
 	}

@@ -10,11 +10,11 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/roasbeef/btcd/btcec"
-	"github.com/roasbeef/btcd/chaincfg"
-	"github.com/roasbeef/btcd/chaincfg/chainhash"
-	"github.com/roasbeef/btcutil"
-	"github.com/roasbeef/btcutil/hdkeychain"
+	"github.com/vertcoin/vtcd/btcec"
+	"github.com/vertcoin/vtcd/chaincfg"
+	"github.com/vertcoin/vtcd/chaincfg/chainhash"
+	"github.com/vertcoin/vtcutil"
+	"github.com/vertcoin/vtcutil/hdkeychain"
 	"github.com/roasbeef/btcwallet/internal/zero"
 	"github.com/roasbeef/btcwallet/snacl"
 	"github.com/roasbeef/btcwallet/walletdb"
@@ -695,7 +695,7 @@ func (m *Manager) rowInterfaceToManaged(ns walletdb.ReadBucket, rowInterface int
 // caches the associated managed address.
 //
 // This function MUST be called with the manager lock held for writes.
-func (m *Manager) loadAndCacheAddress(ns walletdb.ReadBucket, address btcutil.Address) (ManagedAddress, error) {
+func (m *Manager) loadAndCacheAddress(ns walletdb.ReadBucket, address vtcutil.Address) (ManagedAddress, error) {
 	// Attempt to load the raw address information from the database.
 	rowInterface, err := fetchAddress(ns, address.ScriptAddress())
 	if err != nil {
@@ -726,13 +726,13 @@ func (m *Manager) loadAndCacheAddress(ns walletdb.ReadBucket, address btcutil.Ad
 // transactions such as the associated private key for pay-to-pubkey and
 // pay-to-pubkey-hash addresses and the script associated with
 // pay-to-script-hash addresses.
-func (m *Manager) Address(ns walletdb.ReadBucket, address btcutil.Address) (ManagedAddress, error) {
+func (m *Manager) Address(ns walletdb.ReadBucket, address vtcutil.Address) (ManagedAddress, error) {
 	// ScriptAddress will only return a script hash if we're
 	// accessing an address that is either PKH or SH. In
 	// the event we're passed a PK address, convert the
 	// PK to PKH address so that we can access it from
 	// the addrs map and database.
-	if pka, ok := address.(*btcutil.AddressPubKey); ok {
+	if pka, ok := address.(*vtcutil.AddressPubKey); ok {
 		address = pka.AddressPubKeyHash()
 	}
 
@@ -757,7 +757,7 @@ func (m *Manager) Address(ns walletdb.ReadBucket, address btcutil.Address) (Mana
 }
 
 // AddrAccount returns the account to which the given address belongs.
-func (m *Manager) AddrAccount(ns walletdb.ReadBucket, address btcutil.Address) (uint32, error) {
+func (m *Manager) AddrAccount(ns walletdb.ReadBucket, address vtcutil.Address) (uint32, error) {
 	account, err := fetchAddrAccount(ns, address.ScriptAddress())
 	if err != nil {
 		return 0, maybeConvertDbError(err)
@@ -1034,7 +1034,7 @@ func (m *Manager) existsAddress(ns walletdb.ReadBucket, addressID []byte) bool {
 // watching-only, or not for the same network as the key trying to be imported.
 // It will also return an error if the address already exists.  Any other errors
 // returned are generally unexpected.
-func (m *Manager) ImportPrivateKey(ns walletdb.ReadWriteBucket, wif *btcutil.WIF, bs *BlockStamp) (ManagedPubKeyAddress, error) {
+func (m *Manager) ImportPrivateKey(ns walletdb.ReadWriteBucket, wif *vtcutil.WIF, bs *BlockStamp) (ManagedPubKeyAddress, error) {
 	// Ensure the address is intended for network the address manager is
 	// associated with.
 	if !wif.IsForNet(m.chainParams) {
@@ -1054,7 +1054,7 @@ func (m *Manager) ImportPrivateKey(ns walletdb.ReadWriteBucket, wif *btcutil.WIF
 
 	// Prevent duplicates.
 	serializedPubKey := wif.SerializePubKey()
-	pubKeyHash := btcutil.Hash160(serializedPubKey)
+	pubKeyHash := vtcutil.Hash160(serializedPubKey)
 	alreadyExists := m.existsAddress(ns, pubKeyHash)
 	if alreadyExists {
 		str := fmt.Sprintf("address for public key %x already exists",
@@ -1153,7 +1153,7 @@ func (m *Manager) ImportScript(ns walletdb.ReadWriteBucket, script []byte, bs *B
 	}
 
 	// Prevent duplicates.
-	scriptHash := btcutil.Hash160(script)
+	scriptHash := vtcutil.Hash160(script)
 	alreadyExists := m.existsAddress(ns, scriptHash)
 	if alreadyExists {
 		str := fmt.Sprintf("address for script hash %x already exists",
@@ -1408,7 +1408,7 @@ func (m *Manager) fetchUsed(ns walletdb.ReadBucket, addressID []byte) bool {
 }
 
 // MarkUsed updates the used flag for the provided address.
-func (m *Manager) MarkUsed(ns walletdb.ReadWriteBucket, address btcutil.Address) error {
+func (m *Manager) MarkUsed(ns walletdb.ReadWriteBucket, address vtcutil.Address) error {
 	addressID := address.ScriptAddress()
 	err := markAddressUsed(ns, addressID)
 	if err != nil {
@@ -1900,7 +1900,7 @@ func (m *Manager) ForEachActiveAccountAddress(ns walletdb.ReadBucket, account ui
 
 // ForEachActiveAddress calls the given function with each active address
 // stored in the manager, breaking early on error.
-func (m *Manager) ForEachActiveAddress(ns walletdb.ReadBucket, fn func(addr btcutil.Address) error) error {
+func (m *Manager) ForEachActiveAddress(ns walletdb.ReadBucket, fn func(addr vtcutil.Address) error) error {
 	m.mtx.Lock()
 	defer m.mtx.Unlock()
 

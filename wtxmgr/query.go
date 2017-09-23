@@ -8,8 +8,8 @@ package wtxmgr
 import (
 	"fmt"
 
-	"github.com/roasbeef/btcd/chaincfg/chainhash"
-	"github.com/roasbeef/btcutil"
+	"github.com/vertcoin/vtcd/chaincfg/chainhash"
+	"github.com/vertcoin/vtcutil"
 	"github.com/roasbeef/btcwallet/walletdb"
 )
 
@@ -17,7 +17,7 @@ import (
 // transaction.  Further details may be looked up by indexing a wire.MsgTx.TxOut
 // with the Index field.
 type CreditRecord struct {
-	Amount btcutil.Amount
+	Amount vtcutil.Amount
 	Index  uint32
 	Spent  bool
 	Change bool
@@ -27,7 +27,7 @@ type CreditRecord struct {
 // transaction.  Further details may be looked up by indexing a wire.MsgTx.TxIn
 // with the Index field.
 type DebitRecord struct {
-	Amount btcutil.Amount
+	Amount vtcutil.Amount
 	Index  uint32
 }
 

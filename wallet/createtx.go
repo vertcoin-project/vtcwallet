@@ -9,10 +9,10 @@ import (
 	"fmt"
 	"sort"
 
-	"github.com/roasbeef/btcd/btcec"
-	"github.com/roasbeef/btcd/txscript"
-	"github.com/roasbeef/btcd/wire"
-	"github.com/roasbeef/btcutil"
+	"github.com/vertcoin/vtcd/btcec"
+	"github.com/vertcoin/vtcd/txscript"
+	"github.com/vertcoin/vtcd/wire"
+	"github.com/vertcoin/vtcutil"
 	"github.com/roasbeef/btcwallet/waddrmgr"
 	"github.com/roasbeef/btcwallet/wallet/txauthor"
 	"github.com/roasbeef/btcwallet/walletdb"
@@ -34,13 +34,13 @@ func makeInputSource(eligible []wtxmgr.Credit) txauthor.InputSource {
 
 	// Current inputs and their total value.  These are closed over by the
 	// returned input source and reused across multiple calls.
-	currentTotal := btcutil.Amount(0)
+	currentTotal := vtcutil.Amount(0)
 	currentInputs := make([]*wire.TxIn, 0, len(eligible))
 	currentScripts := make([][]byte, 0, len(eligible))
-	currentInputValues := make([]btcutil.Amount, 0, len(eligible))
+	currentInputValues := make([]vtcutil.Amount, 0, len(eligible))
 
-	return func(target btcutil.Amount) (btcutil.Amount, []*wire.TxIn,
-		[]btcutil.Amount, [][]byte, error) {
+	return func(target vtcutil.Amount) (vtcutil.Amount, []*wire.TxIn,
+		[]vtcutil.Amount, [][]byte, error) {
 
 		for currentTotal < target && len(eligible) != 0 {
 			nextCredit := &eligible[0]
@@ -62,7 +62,7 @@ type secretSource struct {
 	addrmgrNs walletdb.ReadBucket
 }
 
-func (s secretSource) GetKey(addr btcutil.Address) (*btcec.PrivateKey, bool, error) {
+func (s secretSource) GetKey(addr vtcutil.Address) (*btcec.PrivateKey, bool, error) {
 	ma, err := s.Address(s.addrmgrNs, addr)
 	if err != nil {
 		return nil, false, err
@@ -81,7 +81,7 @@ func (s secretSource) GetKey(addr btcutil.Address) (*btcec.PrivateKey, bool, err
 	return privKey, ma.Compressed(), nil
 }
 
-func (s secretSource) GetScript(addr btcutil.Address) ([]byte, error) {
+func (s secretSource) GetScript(addr vtcutil.Address) ([]byte, error) {
 	ma, err := s.Address(s.addrmgrNs, addr)
 	if err != nil {
 		return nil, err
@@ -125,7 +125,7 @@ func (w *Wallet) txToOutputs(outputs []*wire.TxOut, account uint32, minconf int3
 		changeSource := func() ([]byte, error) {
 			// Derive the change output script.  As a hack to allow spending from
 			// the imported account, change addresses are created from account 0.
-			var changeAddr btcutil.Address
+			var changeAddr vtcutil.Address
 			var err error
 			if account == waddrmgr.ImportedAddrAccount {
 				changeAddr, err = w.newChangeAddress(addrmgrNs, 0, waddrmgr.WitnessPubKey)
@@ -162,7 +162,7 @@ func (w *Wallet) txToOutputs(outputs []*wire.TxOut, account uint32, minconf int3
 	}
 
 	if tx.ChangeIndex >= 0 && account == waddrmgr.ImportedAddrAccount {
-		changeAmount := btcutil.Amount(tx.Tx.TxOut[tx.ChangeIndex].Value)
+		changeAmount := vtcutil.Amount(tx.Tx.TxOut[tx.ChangeIndex].Value)
 		log.Warnf("Spend from imported account produced change: moving"+
 			" %v from imported account into default account.", changeAmount)
 	}
@@ -228,7 +228,7 @@ func (w *Wallet) findEligibleOutputs(dbtx walletdb.ReadTx, account uint32, minco
 // validateMsgTx verifies transaction input scripts for tx.  All previous output
 // scripts from outputs redeemed by the transaction, in the same order they are
 // spent, must be passed in the prevScripts slice.
-func validateMsgTx(tx *wire.MsgTx, prevScripts [][]byte, inputValues []btcutil.Amount) error {
+func validateMsgTx(tx *wire.MsgTx, prevScripts [][]byte, inputValues []vtcutil.Amount) error {
 	hashCache := txscript.NewTxSigHashes(tx)
 	for i, prevScript := range prevScripts {
 		vm, err := txscript.NewEngine(prevScript, tx, i,

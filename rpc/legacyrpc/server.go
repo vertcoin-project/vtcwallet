@@ -20,7 +20,7 @@ import (
 	"time"
 
 	"github.com/btcsuite/websocket"
-	"github.com/roasbeef/btcd/btcjson"
+	"github.com/vertcoin/vtcd/btcjson"
 	"github.com/roasbeef/btcwallet/chain"
 	"github.com/roasbeef/btcwallet/wallet"
 )
@@ -266,7 +266,7 @@ func (s *Server) SetChainServer(chainClient *chain.RPCClient) {
 
 // handlerClosure creates a closure function for handling requests of the given
 // method.  This may be a request that is handled directly by btcwallet, or
-// a chain server request that is handled by passing the request down to btcd.
+// a chain server request that is handled by passing the request down to vtcd.
 //
 // NOTE: These handlers do not handle special cases, such as the authenticate
 // method.  Each of these must be checked beforehand (the method is already

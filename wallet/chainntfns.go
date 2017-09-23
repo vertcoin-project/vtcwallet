@@ -5,7 +5,7 @@
 package wallet
 
 import (
-	"github.com/roasbeef/btcd/txscript"
+	"github.com/vertcoin/vtcd/txscript"
 	"github.com/roasbeef/btcwallet/chain"
 	"github.com/roasbeef/btcwallet/waddrmgr"
 	"github.com/roasbeef/btcwallet/walletdb"

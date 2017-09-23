@@ -7,7 +7,7 @@ package waddrmgr
 import (
 	"sync"
 
-	"github.com/roasbeef/btcd/chaincfg/chainhash"
+	"github.com/vertcoin/vtcd/chaincfg/chainhash"
 	"github.com/roasbeef/btcwallet/walletdb"
 )
 

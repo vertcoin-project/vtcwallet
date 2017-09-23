@@ -12,7 +12,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/roasbeef/btcd/btcjson"
+	"github.com/vertcoin/vtcd/btcjson"
 	"github.com/roasbeef/btcwallet/internal/rpchelp"
 )
 

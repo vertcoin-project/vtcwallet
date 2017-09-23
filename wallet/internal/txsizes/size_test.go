@@ -3,7 +3,7 @@ package txsizes_test
 import (
 	"testing"
 
-	"github.com/roasbeef/btcd/wire"
+	"github.com/vertcoin/vtcd/wire"
 	. "github.com/roasbeef/btcwallet/wallet/internal/txsizes"
 )
 

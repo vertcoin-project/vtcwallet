@@ -5,8 +5,8 @@
 package votingpool
 
 import (
-	"github.com/roasbeef/btcd/wire"
-	"github.com/roasbeef/btcutil/hdkeychain"
+	"github.com/vertcoin/vtcd/wire"
+	"github.com/vertcoin/vtcutil/hdkeychain"
 	"github.com/roasbeef/btcwallet/waddrmgr"
 	"github.com/roasbeef/btcwallet/walletdb"
 )

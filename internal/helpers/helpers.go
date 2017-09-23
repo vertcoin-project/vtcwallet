@@ -7,14 +7,14 @@
 package helpers
 
 import (
-	"github.com/roasbeef/btcd/wire"
-	"github.com/roasbeef/btcutil"
+	"github.com/vertcoin/vtcd/wire"
+	"github.com/vertcoin/vtcutil"
 )
 
 // SumOutputValues sums up the list of TxOuts and returns an Amount.
-func SumOutputValues(outputs []*wire.TxOut) (totalOutput btcutil.Amount) {
+func SumOutputValues(outputs []*wire.TxOut) (totalOutput vtcutil.Amount) {
 	for _, txOut := range outputs {
-		totalOutput += btcutil.Amount(txOut.Value)
+		totalOutput += vtcutil.Amount(txOut.Value)
 	}
 	return totalOutput
 }

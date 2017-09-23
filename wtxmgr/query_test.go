@@ -11,9 +11,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/roasbeef/btcd/chaincfg/chainhash"
-	"github.com/roasbeef/btcd/wire"
-	"github.com/roasbeef/btcutil"
+	"github.com/vertcoin/vtcd/chaincfg/chainhash"
+	"github.com/vertcoin/vtcd/wire"
+	"github.com/vertcoin/vtcutil"
 	"github.com/roasbeef/btcwallet/walletdb"
 	. "github.com/roasbeef/btcwallet/wtxmgr"
 )
@@ -310,7 +310,7 @@ func TestStoreQueries(t *testing.T) {
 	newState.blocks[0][0].Credits = []CreditRecord{
 		{
 			Index:  0,
-			Amount: btcutil.Amount(recA.MsgTx.TxOut[0].Value),
+			Amount: vtcutil.Amount(recA.MsgTx.TxOut[0].Value),
 			Spent:  false,
 			Change: true,
 		},
@@ -334,7 +334,7 @@ func TestStoreQueries(t *testing.T) {
 		Block:    BlockMeta{Block: Block{Height: -1}},
 		Debits: []DebitRecord{
 			{
-				Amount: btcutil.Amount(recA.MsgTx.TxOut[0].Value),
+				Amount: vtcutil.Amount(recA.MsgTx.TxOut[0].Value),
 				Index:  0, // recB.MsgTx.TxIn index
 			},
 		},
@@ -351,7 +351,7 @@ func TestStoreQueries(t *testing.T) {
 	newState.blocks[0][1].Credits = []CreditRecord{
 		{
 			Index:  0,
-			Amount: btcutil.Amount(recB.MsgTx.TxOut[0].Value),
+			Amount: vtcutil.Amount(recB.MsgTx.TxOut[0].Value),
 			Spent:  false,
 			Change: false,
 		},

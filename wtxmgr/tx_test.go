@@ -13,10 +13,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/roasbeef/btcd/chaincfg"
-	"github.com/roasbeef/btcd/chaincfg/chainhash"
-	"github.com/roasbeef/btcd/wire"
-	"github.com/roasbeef/btcutil"
+	"github.com/vertcoin/vtcd/chaincfg"
+	"github.com/vertcoin/vtcd/chaincfg/chainhash"
+	"github.com/vertcoin/vtcd/wire"
+	"github.com/vertcoin/vtcutil"
 	"github.com/roasbeef/btcwallet/walletdb"
 	_ "github.com/roasbeef/btcwallet/walletdb/bdb"
 	. "github.com/roasbeef/btcwallet/wtxmgr"
@@ -26,7 +26,7 @@ import (
 // 61d3696de4c888730cbe06b0ad8ecb6d72d6108e893895aa9bc067bd7eba3fad:0
 var (
 	TstRecvSerializedTx, _          = hex.DecodeString("010000000114d9ff358894c486b4ae11c2a8cf7851b1df64c53d2e511278eff17c22fb7373000000008c493046022100995447baec31ee9f6d4ec0e05cb2a44f6b817a99d5f6de167d1c75354a946410022100c9ffc23b64d770b0e01e7ff4d25fbc2f1ca8091053078a247905c39fce3760b601410458b8e267add3c1e374cf40f1de02b59213a82e1d84c2b94096e22e2f09387009c96debe1d0bcb2356ffdcf65d2a83d4b34e72c62eccd8490dbf2110167783b2bffffffff0280969800000000001976a914479ed307831d0ac19ebc5f63de7d5f1a430ddb9d88ac38bfaa00000000001976a914dadf9e3484f28b385ddeaa6c575c0c0d18e9788a88ac00000000")
-	TstRecvTx, _                    = btcutil.NewTxFromBytes(TstRecvSerializedTx)
+	TstRecvTx, _                    = vtcutil.NewTxFromBytes(TstRecvSerializedTx)
 	TstRecvTxSpendingTxBlockHash, _ = chainhash.NewHashFromStr("00000000000000017188b968a371bab95aa43522665353b646e41865abae02a4")
 	TstRecvAmt                      = int64(10000000)
 	TstRecvTxBlockDetails           = &BlockMeta{
@@ -38,7 +38,7 @@ var (
 	TstRecvTxOutConfirms = 8074          // hardcoded number of confirmations given the above block height
 
 	TstSpendingSerializedTx, _ = hex.DecodeString("0100000003ad3fba7ebd67c09baa9538898e10d6726dcb8eadb006be0c7388c8e46d69d361000000006b4830450220702c4fbde5532575fed44f8d6e8c3432a2a9bd8cff2f966c3a79b2245a7c88db02210095d6505a57e350720cb52b89a9b56243c15ddfcea0596aedc1ba55d9fb7d5aa0012103cccb5c48a699d3efcca6dae277fee6b82e0229ed754b742659c3acdfed2651f9ffffffffdbd36173f5610e34de5c00ed092174603761595d90190f790e79cda3e5b45bc2010000006b483045022000fa20735e5875e64d05bed43d81b867f3bd8745008d3ff4331ef1617eac7c44022100ad82261fc57faac67fc482a37b6bf18158da0971e300abf5fe2f9fd39e107f58012102d4e1caf3e022757512c204bf09ff56a9981df483aba3c74bb60d3612077c9206ffffffff65536c9d964b6f89b8ef17e83c6666641bc495cb27bab60052f76cd4556ccd0d040000006a473044022068e3886e0299ffa69a1c3ee40f8b6700f5f6d463a9cf9dbf22c055a131fc4abc02202b58957fe19ff1be7a84c458d08016c53fbddec7184ac5e633f2b282ae3420ae012103b4e411b81d32a69fb81178a8ea1abaa12f613336923ee920ffbb1b313af1f4d2ffffffff02ab233200000000001976a91418808b2fbd8d2c6d022aed5cd61f0ce6c0a4cbb688ac4741f011000000001976a914f081088a300c80ce36b717a9914ab5ec8a7d283988ac00000000")
-	TstSpendingTx, _           = btcutil.NewTxFromBytes(TstSpendingSerializedTx)
+	TstSpendingTx, _           = vtcutil.NewTxFromBytes(TstSpendingSerializedTx)
 	TstSpendingTxBlockHeight   = int32(279143)
 	TstSignedTxBlockHash, _    = chainhash.NewHashFromStr("00000000000000017188b968a371bab95aa43522665353b646e41865abae02a4")
 	TstSignedTxBlockDetails    = &BlockMeta{
@@ -90,7 +90,7 @@ func testStore() (*Store, walletdb.DB, func(), error) {
 	return s, db, teardown, err
 }
 
-func serializeTx(tx *btcutil.Tx) []byte {
+func serializeTx(tx *vtcutil.Tx) []byte {
 	var buf bytes.Buffer
 	err := tx.MsgTx().Serialize(&buf)
 	if err != nil {
@@ -103,14 +103,14 @@ func TestInsertsCreditsDebitsRollbacks(t *testing.T) {
 	t.Parallel()
 
 	// Create a double spend of the received blockchain transaction.
-	dupRecvTx, _ := btcutil.NewTxFromBytes(TstRecvSerializedTx)
+	dupRecvTx, _ := vtcutil.NewTxFromBytes(TstRecvSerializedTx)
 	// Switch txout amount to 1 BTC.  Transaction store doesn't
 	// validate txs, so this is fine for testing a double spend
 	// removal.
 	TstDupRecvAmount := int64(1e8)
 	newDupMsgTx := dupRecvTx.MsgTx()
 	newDupMsgTx.TxOut[0].Value = TstDupRecvAmount
-	TstDoubleSpendTx := btcutil.NewTx(newDupMsgTx)
+	TstDoubleSpendTx := vtcutil.NewTx(newDupMsgTx)
 	TstDoubleSpendSerializedTx := serializeTx(TstDoubleSpendTx)
 
 	// Create a "signed" (with invalid sigs) tx that spends output 0 of
@@ -122,14 +122,14 @@ func TestInsertsCreditsDebitsRollbacks(t *testing.T) {
 	spendingTxOut2 := wire.NewTxOut(9e7, []byte{10, 11, 12, 13, 14})
 	spendingTx.AddTxOut(spendingTxOut1)
 	spendingTx.AddTxOut(spendingTxOut2)
-	TstSpendingTx := btcutil.NewTx(spendingTx)
+	TstSpendingTx := vtcutil.NewTx(spendingTx)
 	TstSpendingSerializedTx := serializeTx(TstSpendingTx)
 	var _ = TstSpendingTx
 
 	tests := []struct {
 		name     string
 		f        func(*Store, walletdb.ReadWriteBucket) (*Store, error)
-		bal, unc btcutil.Amount
+		bal, unc vtcutil.Amount
 		unspents map[wire.OutPoint]struct{}
 		unmined  map[chainhash.Hash]struct{}
 	}{
@@ -159,7 +159,7 @@ func TestInsertsCreditsDebitsRollbacks(t *testing.T) {
 				return s, err
 			},
 			bal: 0,
-			unc: btcutil.Amount(TstRecvTx.MsgTx().TxOut[0].Value),
+			unc: vtcutil.Amount(TstRecvTx.MsgTx().TxOut[0].Value),
 			unspents: map[wire.OutPoint]struct{}{
 				wire.OutPoint{
 					Hash:  *TstRecvTx.Hash(),
@@ -186,7 +186,7 @@ func TestInsertsCreditsDebitsRollbacks(t *testing.T) {
 				return s, err
 			},
 			bal: 0,
-			unc: btcutil.Amount(TstRecvTx.MsgTx().TxOut[0].Value),
+			unc: vtcutil.Amount(TstRecvTx.MsgTx().TxOut[0].Value),
 			unspents: map[wire.OutPoint]struct{}{
 				wire.OutPoint{
 					Hash:  *TstRecvTx.Hash(),
@@ -212,7 +212,7 @@ func TestInsertsCreditsDebitsRollbacks(t *testing.T) {
 				err = s.AddCredit(ns, rec, TstRecvTxBlockDetails, 0, false)
 				return s, err
 			},
-			bal: btcutil.Amount(TstRecvTx.MsgTx().TxOut[0].Value),
+			bal: vtcutil.Amount(TstRecvTx.MsgTx().TxOut[0].Value),
 			unc: 0,
 			unspents: map[wire.OutPoint]struct{}{
 				wire.OutPoint{
@@ -237,7 +237,7 @@ func TestInsertsCreditsDebitsRollbacks(t *testing.T) {
 				err = s.AddCredit(ns, rec, TstRecvTxBlockDetails, 0, false)
 				return s, err
 			},
-			bal: btcutil.Amount(TstRecvTx.MsgTx().TxOut[0].Value),
+			bal: vtcutil.Amount(TstRecvTx.MsgTx().TxOut[0].Value),
 			unc: 0,
 			unspents: map[wire.OutPoint]struct{}{
 				wire.OutPoint{
@@ -254,7 +254,7 @@ func TestInsertsCreditsDebitsRollbacks(t *testing.T) {
 				return s, err
 			},
 			bal: 0,
-			unc: btcutil.Amount(TstRecvTx.MsgTx().TxOut[0].Value),
+			unc: vtcutil.Amount(TstRecvTx.MsgTx().TxOut[0].Value),
 			unspents: map[wire.OutPoint]struct{}{
 				wire.OutPoint{
 					Hash:  *TstRecvTx.Hash(),
@@ -280,7 +280,7 @@ func TestInsertsCreditsDebitsRollbacks(t *testing.T) {
 				err = s.AddCredit(ns, rec, TstRecvTxBlockDetails, 0, false)
 				return s, err
 			},
-			bal: btcutil.Amount(TstDoubleSpendTx.MsgTx().TxOut[0].Value),
+			bal: vtcutil.Amount(TstDoubleSpendTx.MsgTx().TxOut[0].Value),
 			unc: 0,
 			unspents: map[wire.OutPoint]struct{}{
 				wire.OutPoint{
@@ -340,7 +340,7 @@ func TestInsertsCreditsDebitsRollbacks(t *testing.T) {
 				return s, err
 			},
 			bal: 0,
-			unc: btcutil.Amount(TstSpendingTx.MsgTx().TxOut[0].Value),
+			unc: vtcutil.Amount(TstSpendingTx.MsgTx().TxOut[0].Value),
 			unspents: map[wire.OutPoint]struct{}{
 				wire.OutPoint{
 					Hash:  *TstSpendingTx.Hash(),
@@ -366,7 +366,7 @@ func TestInsertsCreditsDebitsRollbacks(t *testing.T) {
 				return s, err
 			},
 			bal: 0,
-			unc: btcutil.Amount(TstSpendingTx.MsgTx().TxOut[0].Value + TstSpendingTx.MsgTx().TxOut[1].Value),
+			unc: vtcutil.Amount(TstSpendingTx.MsgTx().TxOut[0].Value + TstSpendingTx.MsgTx().TxOut[1].Value),
 			unspents: map[wire.OutPoint]struct{}{
 				wire.OutPoint{
 					Hash:  *TstSpendingTx.Hash(),
@@ -391,7 +391,7 @@ func TestInsertsCreditsDebitsRollbacks(t *testing.T) {
 				err = s.InsertTx(ns, rec, TstSignedTxBlockDetails)
 				return s, err
 			},
-			bal: btcutil.Amount(TstSpendingTx.MsgTx().TxOut[0].Value + TstSpendingTx.MsgTx().TxOut[1].Value),
+			bal: vtcutil.Amount(TstSpendingTx.MsgTx().TxOut[0].Value + TstSpendingTx.MsgTx().TxOut[1].Value),
 			unc: 0,
 			unspents: map[wire.OutPoint]struct{}{
 				wire.OutPoint{
@@ -411,7 +411,7 @@ func TestInsertsCreditsDebitsRollbacks(t *testing.T) {
 				err := s.Rollback(ns, TstSignedTxBlockDetails.Height+1)
 				return s, err
 			},
-			bal: btcutil.Amount(TstSpendingTx.MsgTx().TxOut[0].Value + TstSpendingTx.MsgTx().TxOut[1].Value),
+			bal: vtcutil.Amount(TstSpendingTx.MsgTx().TxOut[0].Value + TstSpendingTx.MsgTx().TxOut[1].Value),
 			unc: 0,
 			unspents: map[wire.OutPoint]struct{}{
 				wire.OutPoint{
@@ -432,7 +432,7 @@ func TestInsertsCreditsDebitsRollbacks(t *testing.T) {
 				return s, err
 			},
 			bal: 0,
-			unc: btcutil.Amount(TstSpendingTx.MsgTx().TxOut[0].Value + TstSpendingTx.MsgTx().TxOut[1].Value),
+			unc: vtcutil.Amount(TstSpendingTx.MsgTx().TxOut[0].Value + TstSpendingTx.MsgTx().TxOut[1].Value),
 			unspents: map[wire.OutPoint]struct{}{
 				wire.OutPoint{
 					Hash:  *TstSpendingTx.Hash(),
@@ -454,7 +454,7 @@ func TestInsertsCreditsDebitsRollbacks(t *testing.T) {
 				return s, err
 			},
 			bal: 0,
-			unc: btcutil.Amount(TstSpendingTx.MsgTx().TxOut[0].Value + TstSpendingTx.MsgTx().TxOut[1].Value),
+			unc: vtcutil.Amount(TstSpendingTx.MsgTx().TxOut[0].Value + TstSpendingTx.MsgTx().TxOut[1].Value),
 			unspents: map[wire.OutPoint]struct{}{
 				*wire.NewOutPoint(TstSpendingTx.Hash(), 0): {},
 				*wire.NewOutPoint(TstSpendingTx.Hash(), 1): {},
@@ -478,7 +478,7 @@ func TestInsertsCreditsDebitsRollbacks(t *testing.T) {
 				err = s.AddCredit(ns, rec, TstRecvTxBlockDetails, 0, false)
 				return s, err
 			},
-			bal: btcutil.Amount(TstRecvTx.MsgTx().TxOut[0].Value),
+			bal: vtcutil.Amount(TstRecvTx.MsgTx().TxOut[0].Value),
 			unc: 0,
 			unspents: map[wire.OutPoint]struct{}{
 				*wire.NewOutPoint(TstRecvTx.Hash(), 0): {},
@@ -605,7 +605,7 @@ func TestFindingSpentCredits(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	expectedBal := btcutil.Amount(TstSpendingTx.MsgTx().TxOut[0].Value)
+	expectedBal := vtcutil.Amount(TstSpendingTx.MsgTx().TxOut[0].Value)
 	if bal != expectedBal {
 		t.Fatalf("bad balance: %v != %v", bal, expectedBal)
 	}
@@ -702,7 +702,7 @@ func TestCoinbases(t *testing.T) {
 	type balTest struct {
 		height  int32
 		minConf int32
-		bal     btcutil.Amount
+		bal     vtcutil.Amount
 	}
 	balTests := []balTest{
 		// Next block it is still immature
@@ -1173,7 +1173,7 @@ func TestMoveMultipleToSameBlock(t *testing.T) {
 	balTests := []struct {
 		height  int32
 		minConf int32
-		bal     btcutil.Amount
+		bal     vtcutil.Amount
 	}{
 		// Maturity height
 		{

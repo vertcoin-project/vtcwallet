@@ -12,9 +12,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/roasbeef/btcd/chaincfg"
-	"github.com/roasbeef/btcd/chaincfg/chainhash"
-	"github.com/roasbeef/btcutil/hdkeychain"
+	"github.com/vertcoin/vtcd/chaincfg"
+	"github.com/vertcoin/vtcd/chaincfg/chainhash"
+	"github.com/vertcoin/vtcutil/hdkeychain"
 	"github.com/roasbeef/btcwallet/walletdb"
 )
 

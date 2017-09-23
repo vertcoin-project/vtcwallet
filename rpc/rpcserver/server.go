@@ -25,12 +25,12 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 
-	"github.com/roasbeef/btcd/chaincfg/chainhash"
-	"github.com/roasbeef/btcd/txscript"
-	"github.com/roasbeef/btcd/wire"
+	"github.com/vertcoin/vtcd/chaincfg/chainhash"
+	"github.com/vertcoin/vtcd/txscript"
+	"github.com/vertcoin/vtcd/wire"
 	"github.com/roasbeef/btcrpcclient"
-	"github.com/roasbeef/btcutil"
-	"github.com/roasbeef/btcutil/hdkeychain"
+	"github.com/vertcoin/vtcutil"
+	"github.com/vertcoin/vtcutil/hdkeychain"
 	"github.com/roasbeef/btcwallet/chain"
 	"github.com/roasbeef/btcwallet/internal/cfgutil"
 	"github.com/roasbeef/btcwallet/internal/zero"
@@ -108,7 +108,7 @@ type walletServer struct {
 }
 
 // loaderServer provides RPC clients with the ability to load and close wallets,
-// as well as establishing a RPC connection to a btcd consensus server.
+// as well as establishing a RPC connection to a vtcd consensus server.
 type loaderServer struct {
 	loader    *wallet.Loader
 	activeNet *netparams.Params
@@ -226,7 +226,7 @@ func (s *walletServer) NextAddress(ctx context.Context, req *pb.NextAddressReque
 	*pb.NextAddressResponse, error) {
 
 	var (
-		addr btcutil.Address
+		addr vtcutil.Address
 		err  error
 	)
 	switch req.Kind {
@@ -249,7 +249,7 @@ func (s *walletServer) ImportPrivateKey(ctx context.Context, req *pb.ImportPriva
 
 	defer zero.Bytes(req.Passphrase)
 
-	wif, err := btcutil.DecodeWIF(req.PrivateKeyWif)
+	wif, err := vtcutil.DecodeWIF(req.PrivateKeyWif)
 	if err != nil {
 		return nil, grpc.Errorf(codes.InvalidArgument,
 			"Invalid WIF-encoded private key: %v", err)
@@ -330,7 +330,7 @@ func (s *walletServer) FundTransaction(ctx context.Context, req *pb.FundTransact
 	}
 
 	selectedOutputs := make([]*pb.FundTransactionResponse_PreviousOutput, 0, len(unspentOutputs))
-	var totalAmount btcutil.Amount
+	var totalAmount vtcutil.Amount
 	for _, output := range unspentOutputs {
 		selectedOutputs = append(selectedOutputs, &pb.FundTransactionResponse_PreviousOutput{
 			TransactionHash: output.OutPoint.Hash[:],
@@ -340,15 +340,15 @@ func (s *walletServer) FundTransaction(ctx context.Context, req *pb.FundTransact
 			ReceiveTime:     output.ReceiveTime.Unix(),
 			FromCoinbase:    output.OutputKind == wallet.OutputKindCoinbase,
 		})
-		totalAmount += btcutil.Amount(output.Output.Value)
+		totalAmount += vtcutil.Amount(output.Output.Value)
 
-		if req.TargetAmount != 0 && totalAmount > btcutil.Amount(req.TargetAmount) {
+		if req.TargetAmount != 0 && totalAmount > vtcutil.Amount(req.TargetAmount) {
 			break
 		}
 	}
 
 	var changeScript []byte
-	if req.IncludeChangeScript && totalAmount > btcutil.Amount(req.TargetAmount) {
+	if req.IncludeChangeScript && totalAmount > vtcutil.Amount(req.TargetAmount) {
 		changeAddr, err := s.wallet.NewChangeAddress(req.Account, waddrmgr.PubKeyHash)
 		if err != nil {
 			return nil, translateError(err)
@@ -504,7 +504,7 @@ func (s *walletServer) SignTransaction(ctx context.Context, req *pb.SignTransact
 
 // BUGS:
 // - The transaction is not inspected to be relevant before publishing using
-//   sendrawtransaction, so connection errors to btcd could result in the tx
+//   sendrawtransaction, so connection errors to vtcd could result in the tx
 //   never being added to the wallet database.
 // - Once the above bug is fixed, wallet will require a way to purge invalid
 //   transactions from the database when they are rejected by the network, other

@@ -13,12 +13,12 @@ import (
 	"golang.org/x/crypto/ssh/terminal"
 
 	"github.com/jessevdk/go-flags"
-	"github.com/roasbeef/btcd/btcjson"
-	"github.com/roasbeef/btcd/chaincfg/chainhash"
-	"github.com/roasbeef/btcd/txscript"
-	"github.com/roasbeef/btcd/wire"
+	"github.com/vertcoin/vtcd/btcjson"
+	"github.com/vertcoin/vtcd/chaincfg/chainhash"
+	"github.com/vertcoin/vtcd/txscript"
+	"github.com/vertcoin/vtcd/wire"
 	"github.com/roasbeef/btcrpcclient"
-	"github.com/roasbeef/btcutil"
+	"github.com/vertcoin/vtcutil"
 	"github.com/roasbeef/btcwallet/internal/cfgutil"
 	"github.com/roasbeef/btcwallet/netparams"
 	"github.com/roasbeef/btcwallet/wallet/txauthor"
@@ -26,7 +26,7 @@ import (
 )
 
 var (
-	walletDataDirectory = btcutil.AppDataDir("btcwallet", false)
+	walletDataDirectory = vtcutil.AppDataDir("btcwallet", false)
 	newlineBytes        = []byte{'\n'}
 )
 
@@ -140,12 +140,12 @@ func (noInputValue) Error() string { return "no input value" }
 // looked up again by the wallet during the call to signrawtransaction.
 func makeInputSource(outputs []btcjson.ListUnspentResult) txauthor.InputSource {
 	var (
-		totalInputValue btcutil.Amount
+		totalInputValue vtcutil.Amount
 		inputs          = make([]*wire.TxIn, 0, len(outputs))
 		sourceErr       error
 	)
 	for _, output := range outputs {
-		outputAmount, err := btcutil.NewAmount(output.Amount)
+		outputAmount, err := vtcutil.NewAmount(output.Amount)
 		if err != nil {
 			sourceErr = fmt.Errorf(
 				"invalid amount `%v` in listunspent result",
@@ -178,7 +178,7 @@ func makeInputSource(outputs []btcjson.ListUnspentResult) txauthor.InputSource {
 		sourceErr = noInputValue{}
 	}
 
-	return func(btcutil.Amount) (btcutil.Amount, []*wire.TxIn, [][]byte, error) {
+	return func(vtcutil.Amount) (vtcutil.Amount, []*wire.TxIn, [][]byte, error) {
 		return totalInputValue, inputs, nil, sourceErr
 	}
 }
@@ -257,7 +257,7 @@ func sweep() error {
 		}
 	}
 
-	var totalSwept btcutil.Amount
+	var totalSwept vtcutil.Amount
 	var numErrors int
 	var reportError = func(format string, args ...interface{}) {
 		fmt.Fprintf(os.Stderr, format, args...)
@@ -300,7 +300,7 @@ func sweep() error {
 			continue
 		}
 
-		outputAmount := btcutil.Amount(tx.Tx.TxOut[0].Value)
+		outputAmount := vtcutil.Amount(tx.Tx.TxOut[0].Value)
 		fmt.Printf("Swept %v to destination account with transaction %v\n",
 			outputAmount, txHash)
 		totalSwept += outputAmount
@@ -330,8 +330,8 @@ func promptSecret(what string) (string, error) {
 	return string(input), nil
 }
 
-func saneOutputValue(amount btcutil.Amount) bool {
-	return amount >= 0 && amount <= btcutil.MaxSatoshi
+func saneOutputValue(amount vtcutil.Amount) bool {
+	return amount >= 0 && amount <= vtcutil.MaxSatoshi
 }
 
 func parseOutPoint(input *btcjson.ListUnspentResult) (wire.OutPoint, error) {

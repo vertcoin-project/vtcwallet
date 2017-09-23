@@ -11,7 +11,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/roasbeef/btcutil/hdkeychain"
+	"github.com/vertcoin/vtcutil/hdkeychain"
 	vp "github.com/roasbeef/btcwallet/votingpool"
 	"github.com/roasbeef/btcwallet/waddrmgr"
 	"github.com/roasbeef/btcwallet/walletdb"

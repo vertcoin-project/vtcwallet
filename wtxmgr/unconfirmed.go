@@ -6,8 +6,8 @@
 package wtxmgr
 
 import (
-	"github.com/roasbeef/btcd/chaincfg/chainhash"
-	"github.com/roasbeef/btcd/wire"
+	"github.com/vertcoin/vtcd/chaincfg/chainhash"
+	"github.com/vertcoin/vtcd/wire"
 	"github.com/roasbeef/btcwallet/walletdb"
 )
 

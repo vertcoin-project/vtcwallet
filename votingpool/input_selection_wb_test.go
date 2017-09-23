@@ -10,16 +10,16 @@ import (
 	"sort"
 	"testing"
 
-	"github.com/roasbeef/btcd/chaincfg/chainhash"
-	"github.com/roasbeef/btcd/wire"
-	"github.com/roasbeef/btcutil"
+	"github.com/vertcoin/vtcd/chaincfg/chainhash"
+	"github.com/vertcoin/vtcd/wire"
+	"github.com/vertcoin/vtcutil"
 	"github.com/roasbeef/btcwallet/walletdb"
 	"github.com/roasbeef/btcwallet/wtxmgr"
 )
 
 var (
 	// random small number of satoshis used as dustThreshold
-	dustThreshold btcutil.Amount = 1e4
+	dustThreshold vtcutil.Amount = 1e4
 )
 
 func TestGetEligibleInputs(t *testing.T) {

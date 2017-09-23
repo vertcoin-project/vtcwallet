@@ -11,10 +11,10 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/roasbeef/btcd/btcec"
-	"github.com/roasbeef/btcd/chaincfg"
-	"github.com/roasbeef/btcd/wire"
-	"github.com/roasbeef/btcutil"
+	"github.com/vertcoin/vtcd/btcec"
+	"github.com/vertcoin/vtcd/chaincfg"
+	"github.com/vertcoin/vtcd/wire"
+	"github.com/vertcoin/vtcutil"
 	"github.com/roasbeef/btcwallet/internal/legacy/keystore"
 	"github.com/roasbeef/btcwallet/internal/prompt"
 	"github.com/roasbeef/btcwallet/waddrmgr"
@@ -60,7 +60,7 @@ func convertLegacyKeystore(legacyKeyStore *keystore.Store, w *wallet.Wallet) err
 				continue
 			}
 
-			wif, err := btcutil.NewWIF((*btcec.PrivateKey)(privKey),
+			wif, err := vtcutil.NewWIF((*btcec.PrivateKey)(privKey),
 				netParams, addr.Compressed())
 			if err != nil {
 				fmt.Printf("WARN: Failed to create wallet "+

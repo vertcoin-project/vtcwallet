@@ -11,7 +11,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/roasbeef/btcd/chaincfg"
+	"github.com/vertcoin/vtcd/chaincfg"
 	"github.com/roasbeef/btcwallet/waddrmgr"
 	"github.com/roasbeef/btcwallet/walletdb"
 	_ "github.com/roasbeef/btcwallet/walletdb/bdb"

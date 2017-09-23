@@ -4,7 +4,7 @@
 
 package netparams
 
-import "github.com/roasbeef/btcd/chaincfg"
+import "github.com/vertcoin/vtcd/chaincfg"
 
 // Params is used to group parameters for various networks such as the main
 // network and test networks.
@@ -15,7 +15,7 @@ type Params struct {
 }
 
 // MainNetParams contains parameters specific running btcwallet and
-// btcd on the main network (wire.MainNet).
+// vtcd on the main network (wire.MainNet).
 var MainNetParams = Params{
 	Params:        &chaincfg.MainNetParams,
 	RPCClientPort: "8334",
@@ -23,7 +23,7 @@ var MainNetParams = Params{
 }
 
 // TestNet3Params contains parameters specific running btcwallet and
-// btcd on the test network (version 3) (wire.TestNet3).
+// vtcd on the test network (version 3) (wire.TestNet3).
 var TestNet3Params = Params{
 	Params:        &chaincfg.TestNet3Params,
 	RPCClientPort: "18334",

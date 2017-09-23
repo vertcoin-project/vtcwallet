@@ -12,7 +12,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/roasbeef/btcutil/hdkeychain"
+	"github.com/vertcoin/vtcutil/hdkeychain"
 	"github.com/roasbeef/btcwallet/internal/legacy/keystore"
 	"github.com/btcsuite/golangcrypto/ssh/terminal"
 )

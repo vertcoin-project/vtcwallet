@@ -6,7 +6,7 @@
 package wallet
 
 import (
-	"github.com/roasbeef/btcd/chaincfg/chainhash"
+	"github.com/vertcoin/vtcd/chaincfg/chainhash"
 	"github.com/roasbeef/btcwallet/walletdb"
 	"github.com/roasbeef/btcwallet/wtxmgr"
 )

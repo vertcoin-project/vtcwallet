@@ -10,9 +10,9 @@ import (
 	"encoding/gob"
 	"fmt"
 
-	"github.com/roasbeef/btcd/txscript"
-	"github.com/roasbeef/btcd/wire"
-	"github.com/roasbeef/btcutil"
+	"github.com/vertcoin/vtcd/txscript"
+	"github.com/vertcoin/vtcd/wire"
+	"github.com/vertcoin/vtcutil"
 	"github.com/roasbeef/btcwallet/snacl"
 	"github.com/roasbeef/btcwallet/walletdb"
 )
@@ -55,7 +55,7 @@ type dbWithdrawalRow struct {
 	StartAddress  dbWithdrawalAddress
 	ChangeStart   dbChangeAddress
 	LastSeriesID  uint32
-	DustThreshold btcutil.Amount
+	DustThreshold vtcutil.Amount
 	Status        dbWithdrawalStatus
 }
 
@@ -72,7 +72,7 @@ type dbChangeAddress struct {
 
 type dbOutputRequest struct {
 	Addr        string
-	Amount      btcutil.Amount
+	Amount      vtcutil.Amount
 	Server      string
 	Transaction uint32
 }
@@ -88,7 +88,7 @@ type dbWithdrawalOutput struct {
 type dbOutBailmentOutpoint struct {
 	Ntxid  Ntxid
 	Index  uint32
-	Amount btcutil.Amount
+	Amount vtcutil.Amount
 }
 
 type dbChangeAwareTx struct {
@@ -99,7 +99,7 @@ type dbChangeAwareTx struct {
 type dbWithdrawalStatus struct {
 	NextInputAddr  dbWithdrawalAddress
 	NextChangeAddr dbChangeAddress
-	Fees           btcutil.Amount
+	Fees           vtcutil.Amount
 	Outputs        map[OutBailmentID]dbWithdrawalOutput
 	Sigs           map[Ntxid]TxSigs
 	Transactions   map[Ntxid]dbChangeAwareTx
@@ -398,7 +398,7 @@ func serializeSeriesRow(row *dbSeriesRow) ([]byte, error) {
 // serializeWithdrawal constructs a dbWithdrawalRow and serializes it (using
 // encoding/gob) so that it can be stored in the DB.
 func serializeWithdrawal(requests []OutputRequest, startAddress WithdrawalAddress,
-	lastSeriesID uint32, changeStart ChangeAddress, dustThreshold btcutil.Amount,
+	lastSeriesID uint32, changeStart ChangeAddress, dustThreshold vtcutil.Amount,
 	status WithdrawalStatus) ([]byte, error) {
 
 	dbStartAddr := dbWithdrawalAddress{
@@ -492,7 +492,7 @@ func deserializeWithdrawal(p *Pool, ns, addrmgrNs walletdb.ReadBucket, serialize
 	// WithdrawalStatus.Outputs later on.
 	requestsByOID := make(map[OutBailmentID]OutputRequest)
 	for i, req := range row.Requests {
-		addr, err := btcutil.DecodeAddress(req.Addr, chainParams)
+		addr, err := vtcutil.DecodeAddress(req.Addr, chainParams)
 		if err != nil {
 			return nil, newError(ErrWithdrawalStorage,
 				"cannot deserialize addr for requested output", err)
